@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { useLogin } from "../hooks/uselogin";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const { loading, error, handleLogin } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
 
   // Get callback URL from search params (for redirecting after login)
@@ -55,23 +57,48 @@ const Login = () => {
             <input
               type="email"
               placeholder="hello@example.com"
-              className="w-full px-4 py-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:bg-primary/5 focus:ring-primary"
+              className="w-full px-4 py-3 border text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:bg-primary/5 focus:ring-primary"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm text-white mb-1">Password</label>
             <input
               type="password"
               placeholder="********"
-              className="w-full px-4 py-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-3 border text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div> */}
+          <div>
+            <label className="block text-sm text-white mb-1">Password</label>
+            {/* Wrapper for the input and eye button */}
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"} // Dynamic type
+                placeholder="********"
+                className="w-full px-4 py-3 border border-white/20 bg-transparent text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary pr-12"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button" // Important: must be type="button" so it doesn't submit the form
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Options */}
