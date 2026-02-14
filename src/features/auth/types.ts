@@ -11,12 +11,15 @@ export interface User {
 }
 
 export interface LoginData {
-    user: User;
+    id: string;
+    email: string;
+    role: string;
     accessToken: string;
+    refreshToken: string;
 }
 
 export interface LoginResponse {
-    status: boolean;
+    success: boolean;
     message: string;
     data: LoginData;
 }
