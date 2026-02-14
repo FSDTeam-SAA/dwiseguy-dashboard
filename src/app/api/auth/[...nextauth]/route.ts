@@ -71,29 +71,25 @@ const handler = NextAuth({
             throw new Error(data.message || "Login failed");
           }
 
-          const user = data.data?.user;
-          const accessToken = data.data?.accessToken;
+          const userData = data.data;
 
-          console.log("User details:", user);
-          console.log("Token:", accessToken);
-
-          if (!user || !accessToken) {
+          if (!userData?.accessToken) {
             throw new Error("Invalid response from server");
           }
 
           // Return the object that NextAuth will use as 'user' in the jwt callback
           return {
-            id: user._id || user.id, // Ensure we get the ID
-            name: user.name,
-            email: user.email,
-            image: user.profileImage, // Map profileImage to image
-            role: user.role,
-            token: accessToken, // We attach the token here as a property of the user
-            refreshToken: user.refreshToken,
+            id: userData.id || userData._id,
+            email: userData.email,
+            name: userData.email.split("@")[0], // Fallback name
+            image: "", 
+            role: "admin", // Dashboard users are usually admins or staff
+            token: userData.accessToken,
+            refreshToken: userData.refreshToken,
           };
         } catch (error) {
           console.error("Authorize error:", error);
-          throw new Error("Invalid email or password");
+          throw new Error(error instanceof Error ? error.message : "Invalid email or password");
         }
       },
     }),
@@ -130,14 +126,14 @@ const handler = NextAuth({
         console.log("Session callback - Token:", token);
         session.user = {
           ...session.user,
-          id: token.id as string,
-          name: token.name as string,
-          email: token.email as string,
-          image: token.image as string,
-          role: token.role as string,
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          image: token.image,
+          role: token.role,
         };
-        session.accessToken = token.accessToken as string;
-        session.refreshToken = token.refreshToken as string;
+        session.accessToken = token.accessToken;
+        session.refreshToken = token.refreshToken;
       }
       return session;
     },
