@@ -9,7 +9,7 @@ export function useResetPassword() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
 
-    const handleResetPassword = async (data: { email: string; newPassword: string; confirmPassword: string; resetToken: string | null }) => {
+    const handleResetPassword = async (data: { newPassword: string; confirmPassword: string; resetToken: string }) => {
         console.log("=== useResetPassword handleResetPassword ===");
         console.log("Data:", data);
         console.log("Token received:", data.resetToken);
@@ -20,7 +20,7 @@ export function useResetPassword() {
         setSuccess(false);
         try {
             console.log("Calling resetPasswordApi...");
-            const response = await resetPasswordApi(data, data.resetToken!);
+            const response = await resetPasswordApi(data);
             console.log("resetPasswordApi response:", response);
             setSuccess(true);
             return response;

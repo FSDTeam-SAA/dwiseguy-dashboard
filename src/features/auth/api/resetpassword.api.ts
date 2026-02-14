@@ -1,31 +1,16 @@
 // features/auth/api/resetpassword.api.ts
 import { api } from "@/lib/api";
 
-export const resetPassword = async (data: { email: string; newPassword: string }, token: string) => {
-    console.log("=== resetPassword API ===");
-    console.log("Data to send:", data);
-    console.log("Token to send:", token);
-    console.log("Authorization header:", `Bearer ${token}`);
+export const resetPassword = async (data: { newPassword: string; confirmPassword: string; resetToken: string }) => {
+    const formData = new FormData();
+    formData.append("newPassword", data.newPassword);
+    formData.append("confirmPassword", data.confirmPassword);
+    formData.append("resetToken", data.resetToken);
 
     try {
-        const res = await api.post('/auth/reset-password', data, {
+        const res = await api.post('/auth/reset-password', formData, {
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        console.log("API response:", res.data);
-        return res.data;
-    } catch (error) {
-        console.error("API error:", error);
-        throw error;
-    }
-};
-
-export const changePassword = async (data: { userId: string; oldPassword: string; newPassword: string }, accessToken: string) => {
-    try {
-        const res = await api.post('/auth/change-password', data, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "multipart/form-data",
             },
         });
         return res.data;
