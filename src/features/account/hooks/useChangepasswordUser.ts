@@ -17,7 +17,7 @@ export const useChangePassword = () => {
     const [error, setError] = useState<string | null>(null);
     const { data: session } = useSession();
 
-    const handleChangePassword = async (data: { oldPassword: string; newPassword: string }) => {
+    const handleChangePassword = async (data: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
         setLoading(true);
         setError(null);
 

@@ -33,12 +33,11 @@ const ChangePassword = () => {
             return;
         }
 
-        const userId = "69601438dd15900adb7cec25"; // Hardcoded as per requirements
 
         const res = await handleChangePassword({
-            userId,
             oldPassword,
-            newPassword
+            newPassword,
+            confirmPassword
         });
 
         if (res) {
