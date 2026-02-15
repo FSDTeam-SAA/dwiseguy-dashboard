@@ -1,4 +1,4 @@
-import NewPassword from '@/features/auth1/component/NewPassword'
+import NewPassword from '@/features/auth/component/NewPassword'
 import React, { Suspense } from 'react'
 
 const page = () => {

@@ -1,6 +1,6 @@
 
 
-import Login from "@/features/auth1/component/Login";
+import Login from "@/features/auth/component/Login";
 import { Suspense } from "react";
 
 export default function Page() {
