@@ -1,4 +1,4 @@
-import Verifycode from "@/features/auth1/component/Verifycode";
+import Verifycode from "@/features/auth/component/Verifycode";
 import { Suspense } from "react";
 
 export default function page() {
