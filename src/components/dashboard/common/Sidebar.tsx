@@ -8,6 +8,13 @@ import {
   LogOut,
   Book,
   BookOpen,
+  BarChart3,
+  FolderKanban,
+  FileText,
+  Dumbbell,
+  ClipboardCheck,
+  UserPlus,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -25,11 +32,22 @@ import {
 import { Button } from "@/components/ui/button";
 
 const navigation = [
-  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { name: "All Categories", href: "/dashboard/AllCategories", icon: Book },
-  { name: "All Books", href: "/dashboard/allbooks", icon: BookOpen },
-  // { name: "Products", href: "/dashboard/products", icon: ShoppingBasket },
-  { name: "Set Pricing", href: "/dashboard/setPricing", icon: NotebookText },
+  // { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  // { name: "All Categories", href: "/dashboard/AllCategories", icon: Book },
+  // { name: "All Books", href: "/dashboard/allbooks", icon: BookOpen },
+  // { name: "Set Pricing", href: "/dashboard/setPricing", icon: NotebookText },
+
+  
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Students Progress", href: "/dashboard/students-progress", icon: BarChart3 },
+  { name: "Manage Course", href: "/dashboard/manage-course", icon: BookOpen },
+  { name: "Manage Module", href: "/dashboard/manage-module", icon: FolderKanban },
+  { name: "Manage Lessons", href: "/dashboard/manage-lessons", icon: FileText },
+  { name: "Manage Exercise", href: "/dashboard/manage-exercise", icon: Dumbbell },
+  { name: "Quizzes", href: "/dashboard/quizzes", icon: ClipboardCheck },
+  { name: "Add Member", href: "/dashboard/add-member", icon: UserPlus },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+
 ];
 
 export default function Sidebar() {
