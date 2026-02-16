@@ -32,12 +32,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 const navigation = [
-  // { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  // { name: "All Categories", href: "/dashboard/AllCategories", icon: Book },
-  // { name: "All Books", href: "/dashboard/allbooks", icon: BookOpen },
-  // { name: "Set Pricing", href: "/dashboard/setPricing", icon: NotebookText },
-
-  
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Students Progress", href: "/dashboard/students-progress", icon: BarChart3 },
   { name: "Manage Course", href: "/dashboard/manage-course", icon: BookOpen },
@@ -61,7 +55,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="flex h-screen w-64 flex-col bg-white border-r border-gray-200 fixed">
+    <div className="flex h-screen w-64 flex-col bg-[#0F1829] border-r border-gray-200 fixed">
       {/* Logo */}
       <div className="flex  items-center py-5 justify-center px-6">
         <Link href="/dashboard" className="flex items-center ">
@@ -77,7 +71,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      <nav className="flex-1 overflow-y-auto  px-3 py-4 space-y-6">
         {navigation.map((item) => {
           // Active logic
           // const isActive =
@@ -95,12 +89,13 @@ export default function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg p-3 text-base leading-[150%] tracking-[0%] font-semibold transition-colors",
+                "flex items-center gap-3 rounded-lg p-3 text-base font-semibold transition-colors",
                 isActive
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                  ? "bg-primary text-white" 
+                  : "text-white hover:bg-white/10 hover:text-white" 
               )}
             >
+              {/* Use 'currentColor' or no specific text color class to inherit from parent Link */}
               <item.icon className="h-5 w-5" />
               {item.name}
             </Link>
