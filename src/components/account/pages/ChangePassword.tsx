@@ -31,6 +31,7 @@ const ChangePassword = () => {
   const [formData, setFormData] = useState({
     oldPassword: "",
     newPassword: "",
+    confirmPassword: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,6 +44,7 @@ const ChangePassword = () => {
     const res = await handleChangePassword({
       oldPassword: formData.oldPassword,
       newPassword: formData.newPassword,
+      confirmPassword: formData.confirmPassword,
     });
 
     if (res) {
@@ -50,7 +52,7 @@ const ChangePassword = () => {
         description: "Your password protocol has been synchronized.",
         icon: <ShieldCheck className="text-green-500" />,
       });
-      setFormData({ oldPassword: "", newPassword: "" });
+      setFormData({ oldPassword: "", newPassword: "", confirmPassword: "" });
     }
   };
 

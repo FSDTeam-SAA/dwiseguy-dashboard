@@ -64,10 +64,9 @@ const NewPassword = () => {
 
         console.log("Calling handleResetPassword with:", { email, newPassword: "***", confirmPassword: "***", resetToken });
         const res = await handleResetPassword({
-            email,
-            newPassword,
-            confirmPassword,
-            resetToken,
+            newPassword: newPassword,
+            confirmPassword: confirmPassword,
+            resetToken: resetToken,
         });
 
         console.log("handleResetPassword response:", res);

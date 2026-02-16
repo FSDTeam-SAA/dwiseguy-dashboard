@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { getOverviewData } from "../api/overview.api";
 
 interface OverviewData {
-  totalRevenue: string;
-  paidOrdersCount: number;
-  totalUsersCount: number;
+  totalEnrolledStudents: number;
+  totalLessonsCompleted: number;
+  totalModulesPassed: number;
+  completedCourses: number;
 }
 
 export function useOverview() {
@@ -17,7 +18,7 @@ export function useOverview() {
     async function fetchOverview() {
       try {
         const res = await getOverviewData();
-        setData(res.data); 
+        setData(res.data);
       } catch (err) {
         setError(err);
       } finally {

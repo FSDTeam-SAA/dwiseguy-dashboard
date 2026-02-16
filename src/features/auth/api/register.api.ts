@@ -5,7 +5,7 @@ import { RegisterFormData } from "../types";
 
 export const registeruser = async (data: RegisterFormData) => {
     try {
-        const response = await api.post("/auth/register", data);
+        const response = await api.post("/auth/registration", data);
         return response.data;
     } catch (error) {
         throw error;

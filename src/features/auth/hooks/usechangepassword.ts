@@ -1,6 +1,6 @@
 // features/auth/hooks/usechangepassword.ts
 import { useState } from "react";
-import { changePassword } from "../api/resetpassword.api";
+import { changePassword } from "@/features/account/api/changepassword.api";
 import { useSession } from "next-auth/react";
 
 export const useChangePassword = () => {
@@ -8,7 +8,7 @@ export const useChangePassword = () => {
     const [error, setError] = useState<string | null>(null);
     const { data: session } = useSession();
 
-    const handleChangePassword = async (data: { userId: string; oldPassword: string; newPassword: string }) => {
+    const handleChangePassword = async (data: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
         setLoading(true);
         setError(null);
 
