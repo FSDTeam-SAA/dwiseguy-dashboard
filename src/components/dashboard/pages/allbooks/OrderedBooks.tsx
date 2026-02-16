@@ -1,5 +1,5 @@
 "use client";
-import { useAllOrders, Order } from '@/features/dashboard/hooks/useAllOrders';
+import { useAllOrders, Order } from '../../../../features/dashboard/hooks/useAllOrders';
 
 import Image from 'next/image';
 import React from 'react';
