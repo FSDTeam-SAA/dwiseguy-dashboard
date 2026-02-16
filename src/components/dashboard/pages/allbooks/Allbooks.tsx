@@ -17,7 +17,7 @@ const Allbooks = () => {
           <div className="relative w-full max-w-[320px]">
             <Link href="/create-book">
               <Button
-                className="text-lg font-bold text-primary bg-transparent border border-primary 
+                className="text-lg font-bold text-primary bg-transparent border border-primary
              px-8 py-4 rounded-lg hover:bg-primary hover:text-white"
               >
                 Add New Book
