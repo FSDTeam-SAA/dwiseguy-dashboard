@@ -1,8 +1,10 @@
 "use client";
-import { useAllOrders } from '@/features/dashboard/hooks/useAllOrders';
+import { useAllOrders, Order } from '@/features/dashboard/hooks/useAllOrders';
+
 import Image from 'next/image';
 import React from 'react';
-import { Loader2, Package, User, Truck } from 'lucide-react';
+import { Package, User, Truck } from 'lucide-react';
+
 import OrderedBooksSkeleton from './OrderedBooksSkeleton';
 import { useStatusUpdate } from '@/features/dashboard/hooks/useStatusUpdate';
 import {
@@ -52,7 +54,7 @@ const OrderedBooks = () => {
 
             {orders.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {orders.map((order) => (
+                    {orders.map((order: Order) => (
                         <div key={order._id} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
                             {/* Book Image Section */}
                             <div className="relative w-full h-56 bg-gray-50 overflow-hidden">
@@ -77,8 +79,13 @@ const OrderedBooks = () => {
                                             order.status === 'canceled' ? 'bg-rose-500 text-white' :
                                                 'bg-slate-400 text-white'
                                         }`}>
-                                        Payment: {order.status}
+                                        Payment: {order.status === 'paid' ? 'Paid' :
+                                            order.status === 'pending' ? 'Pending' :
+                                                order.status === 'canceled' ? 'Canceled' :
+                                                    order.status}
                                     </span>
+
+
                                     <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg border border-gray-200 shadow-sm flex items-center gap-2">
                                         <Truck size={12} className="text-orange-600" />
                                         <span className="text-[10px] font-bold text-gray-700 uppercase">
