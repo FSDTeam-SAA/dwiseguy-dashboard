@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   NotebookText,
   LogOut,
-  Book,
   BookOpen,
   BarChart3,
   FolderKanban,
@@ -33,15 +32,27 @@ import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Students Progress", href: "/dashboard/students-progress", icon: BarChart3 },
+  { name: "Instruments", href: "/dashboard/instruments", icon: NotebookText },
+  {
+    name: "Students Progress",
+    href: "/dashboard/students-progress",
+    icon: BarChart3,
+  },
   { name: "Manage Course", href: "/dashboard/manage-course", icon: BookOpen },
-  { name: "Manage Module", href: "/dashboard/manage-module", icon: FolderKanban },
+  {
+    name: "Manage Module",
+    href: "/dashboard/manage-module",
+    icon: FolderKanban,
+  },
   { name: "Manage Lessons", href: "/dashboard/manage-lessons", icon: FileText },
-  { name: "Manage Exercise", href: "/dashboard/manage-exercise", icon: Dumbbell },
+  {
+    name: "Manage Exercise",
+    href: "/dashboard/manage-exercise",
+    icon: Dumbbell,
+  },
   { name: "Quizzes", href: "/dashboard/quizzes", icon: ClipboardCheck },
   { name: "Add Member", href: "/dashboard/add-member", icon: UserPlus },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
-
 ];
 
 export default function Sidebar() {
@@ -91,8 +102,8 @@ export default function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg p-3 text-base font-semibold transition-colors",
                 isActive
-                  ? "bg-primary text-white" 
-                  : "text-white hover:bg-white/10 hover:text-white" 
+                  ? "bg-primary text-white"
+                  : "text-white hover:bg-white/10 hover:text-white",
               )}
             >
               {/* Use 'currentColor' or no specific text color class to inherit from parent Link */}
