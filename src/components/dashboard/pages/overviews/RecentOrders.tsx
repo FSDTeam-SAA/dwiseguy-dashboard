@@ -1,5 +1,5 @@
 
-import RecentOrdersTable from '@/components/Table/RecentOrdersTable'
+// import RecentOrdersTable from '@/components/Table/RecentOrdersTable'
 import React from 'react'
 
 const RecentOrders = () => {
@@ -30,7 +30,7 @@ const RecentOrders = () => {
             </div>
 
             {/* Table */}
-            <RecentOrdersTable />
+            {/* <RecentOrdersTable /> */}
         </div>
 
     )
