@@ -37,7 +37,7 @@ const instrumentSchema = z.object({
     .string()
     .min(10, "Description must be at least 10 characters"),
   level: z.enum(["beginner", "intermediate", "advanced"]),
-  isActive: z.boolean(),
+  isActive: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof instrumentSchema>;
@@ -61,7 +61,7 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(instrumentSchema) as any,
+    resolver: zodResolver(instrumentSchema),
     defaultValues: {
       instrumentTitle: "",
       instrumentDescription: "",
@@ -117,7 +117,7 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
     formData.append("instrumentTitle", values.instrumentTitle);
     formData.append("instrumentDescription", values.instrumentDescription);
     formData.append("level", values.level);
-    formData.append("isActive", values.isActive.toString());
+    formData.append("isActive", (values.isActive ?? true).toString());
     if (imageFile) {
       formData.append("image", imageFile);
     }
@@ -128,7 +128,7 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl font-bold bg-linear-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
             {initialData ? "Update Instrument" : "Create New Instrument"}
           </DialogTitle>
         </DialogHeader>
@@ -199,7 +199,7 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                     </FormLabel>
                     <Select
                       onValueChange={(val) => field.onChange(val === "true")}
-                      defaultValue={field.value.toString()}
+                      defaultValue={(field.value ?? true).toString()}
                     >
                       <FormControl>
                         <SelectTrigger className="border-gray-200">

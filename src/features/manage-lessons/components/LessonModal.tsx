@@ -31,7 +31,7 @@ const lessonSchema = z.object({
   content: z.string().min(5, "Content must be at least 5 characters"),
   moduleId: z.string().min(1, "Module ID is required"),
   order: z.number().min(1, "Order must be at least 1"),
-  isExercise: z.boolean().default(false),
+  isExercise: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof lessonSchema>;
@@ -101,13 +101,15 @@ const LessonModal: React.FC<LessonModalProps> = ({
           order: 1,
           isExercise: false,
         });
-        setImagePreview(null);
-        setImageFile(null);
-        setAudioPreview(null);
-        setAudioFile(null);
+        setTimeout(() => {
+          setImagePreview(null);
+          setImageFile(null);
+          setAudioPreview(null);
+          setAudioFile(null);
+        }, 0);
       }
     }
-  }, [initialData, form, isOpen, moduleId]);
+  }, [initialData, form, isOpen, moduleId, imagePreview, audioPreview]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

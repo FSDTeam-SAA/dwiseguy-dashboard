@@ -45,6 +45,7 @@ const StudentProgressTable: React.FC<StudentProgressTableProps> = ({
   onSearchChange,
   searchValue,
 }) => {
+  "use no memo";
   const [localSearch, setLocalSearch] = useState(searchValue);
 
   useEffect(() => {
@@ -175,6 +176,7 @@ const StudentProgressTable: React.FC<StudentProgressTableProps> = ({
     [],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

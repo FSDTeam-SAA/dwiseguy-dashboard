@@ -111,5 +111,5 @@ export interface UpdateExerciseContentResponse {
 export interface DeleteExerciseContentResponse {
   success: boolean;
   message: string;
-  data: any;
+  data: unknown;
 }

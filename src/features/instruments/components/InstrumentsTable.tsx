@@ -37,6 +37,8 @@ interface InstrumentsTableProps {
 }
 
 const columnHelper = createColumnHelper<Instrument>();
+const coreRowModel = getCoreRowModel();
+const paginationRowModel = getPaginationRowModel();
 
 const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
   data,
@@ -45,6 +47,8 @@ const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
   onAdd,
   pagination,
 }) => {
+  "use no memo";
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("instrumentImage", {
@@ -150,11 +154,12 @@ const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
     [onEdit, onDelete],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getCoreRowModel: coreRowModel,
+    getPaginationRowModel: paginationRowModel,
   });
 
   return (

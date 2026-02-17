@@ -6,6 +6,14 @@ import {
   deleteLessonApi,
 } from "../api/lessons.api";
 
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export const useCreateLessonMutation = () => {
   const queryClient = useQueryClient();
 
@@ -15,7 +23,7 @@ export const useCreateLessonMutation = () => {
       toast.success(data.message || "Lesson created successfully");
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to create lesson");
     },
   });
@@ -31,7 +39,7 @@ export const useUpdateLessonMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
       queryClient.invalidateQueries({ queryKey: ["lesson"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to update lesson");
     },
   });
@@ -46,7 +54,7 @@ export const useDeleteLessonMutation = () => {
       toast.success(data.message || "Lesson deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to delete lesson");
     },
   });

@@ -9,16 +9,28 @@ import {
   deleteExerciseContentApi,
 } from "../api/exercise.api";
 
+interface ApiResponse {
+  message: string;
+}
+
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export const useCreateExerciseMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createExerciseApi,
-    onSuccess: (data: any) => {
+    onSuccess: (data: ApiResponse) => {
       toast.success(data.message || "Exercise created successfully");
       queryClient.invalidateQueries({ queryKey: ["exercises"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to create exercise");
     },
   });
@@ -29,12 +41,12 @@ export const useUpdateExerciseMutation = () => {
 
   return useMutation({
     mutationFn: updateExerciseApi,
-    onSuccess: (data: any) => {
+    onSuccess: (data: ApiResponse) => {
       toast.success(data.message || "Exercise updated successfully");
       queryClient.invalidateQueries({ queryKey: ["exercises"] });
       queryClient.invalidateQueries({ queryKey: ["exercise"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to update exercise");
     },
   });
@@ -45,11 +57,11 @@ export const useDeleteExerciseMutation = () => {
 
   return useMutation({
     mutationFn: deleteExerciseApi,
-    onSuccess: (data: any) => {
+    onSuccess: (data: ApiResponse) => {
       toast.success(data.message || "Exercise deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["exercises"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to delete exercise");
     },
   });
@@ -62,13 +74,13 @@ export const useCreateExerciseContentMutation = () => {
 
   return useMutation({
     mutationFn: createExerciseContentApi,
-    onSuccess: (data: any) => {
+    onSuccess: (data: ApiResponse) => {
       toast.success(data.message || "Exercise content created successfully");
       queryClient.invalidateQueries({ queryKey: ["exercise-contents"] });
       // Might also need to invalidate the specific exercise if it contains the content list
       queryClient.invalidateQueries({ queryKey: ["exercise"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error.response?.data?.message || "Failed to create exercise content",
       );
@@ -81,12 +93,12 @@ export const useUpdateExerciseContentMutation = () => {
 
   return useMutation({
     mutationFn: updateExerciseContentApi,
-    onSuccess: (data: any) => {
+    onSuccess: (data: ApiResponse) => {
       toast.success(data.message || "Exercise content updated successfully");
       queryClient.invalidateQueries({ queryKey: ["exercise-contents"] });
       queryClient.invalidateQueries({ queryKey: ["exercise-content"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error.response?.data?.message || "Failed to update exercise content",
       );
@@ -99,12 +111,12 @@ export const useDeleteExerciseContentMutation = () => {
 
   return useMutation({
     mutationFn: deleteExerciseContentApi,
-    onSuccess: (data: any) => {
+    onSuccess: (data: ApiResponse) => {
       toast.success(data.message || "Exercise content deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["exercise-contents"] });
       queryClient.invalidateQueries({ queryKey: ["exercise"] });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error.response?.data?.message || "Failed to delete exercise content",
       );
