@@ -43,8 +43,9 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
   onAdd,
   pagination,
 }) => {
+  "use no memo";
   console.log("data", data);
-  
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("images", {
@@ -120,6 +121,7 @@ const ModulesTable: React.FC<ModulesTableProps> = ({
     [onEdit, onDelete],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
