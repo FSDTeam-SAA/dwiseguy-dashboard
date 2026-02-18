@@ -6,6 +6,14 @@ import {
 } from "../api/instruments.api";
 import { toast } from "sonner";
 
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export const useInstrumentsMutations = () => {
   const queryClient = useQueryClient();
 
@@ -15,7 +23,7 @@ export const useInstrumentsMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["instruments"] });
       toast.success(data.message || "Instrument created successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const message = error?.response?.data?.message || "Operation failed";
       toast.error(message);
     },
@@ -27,7 +35,7 @@ export const useInstrumentsMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["instruments"] });
       toast.success(data.message || "Instrument updated successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error?.response?.data?.message || "Failed to update instrument",
       );
@@ -40,7 +48,7 @@ export const useInstrumentsMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["instruments"] });
       toast.success(data.message || "Instrument deleted successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error?.response?.data?.message || "Failed to delete instrument",
       );

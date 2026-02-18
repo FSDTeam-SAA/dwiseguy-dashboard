@@ -38,7 +38,7 @@ const navigation = [
     href: "/dashboard/students-progress",
     icon: BarChart3,
   },
-  { name: "Manage Course", href: "/dashboard/manage-course", icon: BookOpen },
+  // { name: "Manage Course", href: "/dashboard/manage-course", icon: BookOpen },
   {
     name: "Manage Module",
     href: "/dashboard/manage-module",
@@ -84,8 +84,6 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto  px-3 py-4 space-y-6">
         {navigation.map((item) => {
-         
-
           const isActive =
             item.href === "/dashboard"
               ? pathname === "/dashboard"

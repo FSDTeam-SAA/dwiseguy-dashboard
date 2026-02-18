@@ -16,57 +16,51 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Instrument } from "../type";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ExerciseContent } from "../types";
+import { Loader2, X, ImagePlus, Music, FileAudio } from "lucide-react";
 import Image from "next/image";
 
-const instrumentSchema = z.object({
-  instrumentTitle: z.string().min(2, "Title must be at least 2 characters"),
-  instrumentDescription: z
-    .string()
-    .min(10, "Description must be at least 10 characters"),
-  level: z.enum(["beginner", "intermediate", "advanced"]),
-  isActive: z.boolean().optional(),
+const contentSchema = z.object({
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  description: z.string().min(5, "Description must be at least 5 characters"),
+  keyNotes: z.string().optional(), // Comma separated string for input
 });
 
-type FormValues = z.infer<typeof instrumentSchema>;
+type FormValues = z.infer<typeof contentSchema>;
 
-interface InstrumentModalProps {
+interface ExerciseContentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: FormData) => void;
   isLoading: boolean;
-  initialData?: Instrument | null;
+  initialData?: ExerciseContent | null;
+  exerciseId: string;
 }
 
-const InstrumentModal: React.FC<InstrumentModalProps> = ({
+const ExerciseContentModal: React.FC<ExerciseContentModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   isLoading,
   initialData,
+  exerciseId,
 }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioPreview, setAudioPreview] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(instrumentSchema),
+    resolver: zodResolver(contentSchema),
     defaultValues: {
-      instrumentTitle: "",
-      instrumentDescription: "",
-      level: "beginner",
-      isActive: true,
+      title: "",
+      description: "",
+      keyNotes: "",
     },
   });
 
@@ -74,28 +68,32 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
     if (isOpen) {
       if (initialData) {
         form.reset({
-          instrumentTitle: initialData.instrumentTitle,
-          instrumentDescription: initialData.instrumentDescription,
-          level: initialData.level,
-          isActive: initialData.isActive,
+          title: initialData.title,
+          description: initialData.description,
+          keyNotes: initialData.keyNotes?.join(", ") || "",
         });
 
-        const timer = setTimeout(() => {
-          setImagePreview(initialData.instrumentImage?.url || null);
+        // Handle Image Preview
+        setTimeout(() => {
+          setImagePreview(initialData.image?.url || null);
+          setImageFile(null);
+
+          // Handle Audio Preview
+          setAudioPreview(initialData.audio?.url || null);
+          setAudioFile(null);
         }, 0);
-        return () => clearTimeout(timer);
       } else {
         form.reset({
-          instrumentTitle: "",
-          instrumentDescription: "",
-          level: "beginner",
-          isActive: true,
+          title: "",
+          description: "",
+          keyNotes: "",
         });
-        const timer = setTimeout(() => {
+        setTimeout(() => {
           setImagePreview(null);
           setImageFile(null);
+          setAudioPreview(null);
+          setAudioFile(null);
         }, 0);
-        return () => clearTimeout(timer);
       }
     }
   }, [initialData, form, isOpen]);
@@ -112,24 +110,51 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
     }
   };
 
+  const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAudioFile(file);
+      setAudioPreview(URL.createObjectURL(file));
+    }
+  };
+
   const onFormSubmit = (values: FormValues) => {
     const formData = new FormData();
-    formData.append("instrumentTitle", values.instrumentTitle);
-    formData.append("instrumentDescription", values.instrumentDescription);
-    formData.append("level", values.level);
-    formData.append("isActive", (values.isActive ?? true).toString());
+    const keyNotesArray = values.keyNotes
+      ? values.keyNotes
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    const jsonData: Record<string, unknown> = {
+      title: values.title,
+      description: values.description,
+      keyNotes: keyNotesArray,
+    };
+
+    if (!initialData) {
+      jsonData.exerciseId = exerciseId;
+    }
+
+    formData.append("value", JSON.stringify(jsonData));
+
     if (imageFile) {
       formData.append("image", imageFile);
     }
+    if (audioFile) {
+      formData.append("audio", audioFile);
+    }
+
     onSubmit(formData);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold bg-linear-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
-            {initialData ? "Update Instrument" : "Create New Instrument"}
+            {initialData ? "Update Content" : "Create New Content"}
           </DialogTitle>
         </DialogHeader>
 
@@ -140,15 +165,15 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
           >
             <FormField
               control={form.control}
-              name="instrumentTitle"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-gray-700">
-                    Instrument Title
+                    Title
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g. Piano, Guitar..."
+                      placeholder="e.g. Note C Major"
                       {...field}
                       className="border-gray-200 focus:border-orange-500 focus:ring-orange-500"
                     />
@@ -158,68 +183,9 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="level"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold text-gray-700">
-                      Level
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="border-gray-200">
-                          <SelectValue placeholder="Select level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">
-                          Intermediate
-                        </SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold text-gray-700">
-                      Status
-                    </FormLabel>
-                    <Select
-                      onValueChange={(val) => field.onChange(val === "true")}
-                      defaultValue={(field.value ?? true).toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="border-gray-200">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="true">Active</SelectItem>
-                        <SelectItem value="false">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
             <FormField
               control={form.control}
-              name="instrumentDescription"
+              name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-gray-700">
@@ -227,7 +193,7 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe the instrument..."
+                      placeholder="Content description..."
                       className="min-h-[100px] border-gray-200 focus:border-orange-500 focus:ring-orange-500"
                       {...field}
                     />
@@ -237,9 +203,33 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="keyNotes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-gray-700">
+                    Key Notes
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. C, E, G (comma separated)"
+                      {...field}
+                      className="border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Enter key notes separated by commas.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Image Upload */}
             <div className="space-y-4">
               <FormLabel className="font-bold text-gray-700">
-                Instrument Image
+                Content Image
               </FormLabel>
               <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
                 {imagePreview ? (
@@ -265,15 +255,12 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center cursor-pointer w-full py-8">
+                  <label className="flex flex-col items-center justify-center cursor-pointer w-full py-4">
                     <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-3">
                       <ImagePlus className="w-6 h-6" />
                     </div>
                     <span className="text-sm font-medium text-gray-600">
                       Click to upload image
-                    </span>
-                    <span className="text-xs text-gray-400 mt-1">
-                      Recommended: 1200x800px
                     </span>
                     <input
                       type="file"
@@ -282,6 +269,62 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                       onChange={handleImageChange}
                     />
                   </label>
+                )}
+              </div>
+            </div>
+
+            {/* Audio Upload */}
+            <div className="space-y-4">
+              <FormLabel className="font-bold text-gray-700">
+                Content Audio
+              </FormLabel>
+              <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                {audioPreview ? (
+                  <div className="w-full flex items-center justify-between bg-white p-3 rounded-xl border">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                        <Music className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]">
+                        {audioFile?.name || "Audio File"}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => {
+                        setAudioFile(null);
+                        setAudioPreview(null);
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center cursor-pointer w-full py-4">
+                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                      <FileAudio className="w-6 h-6" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600">
+                      Click to upload audio
+                    </span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="audio/*"
+                      onChange={handleAudioChange}
+                    />
+                  </label>
+                )}
+                {audioPreview && !audioFile && (
+                  <audio controls src={audioPreview} className="w-full mt-2" />
+                )}
+                {audioPreview && audioFile && (
+                  <div className="text-xs text-center text-gray-500">
+                    Audio selected
+                  </div>
                 )}
               </div>
             </div>
@@ -306,9 +349,9 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                     Saving...
                   </>
                 ) : initialData ? (
-                  "Update Instrument"
+                  "Update Content"
                 ) : (
-                  "Create Instrument"
+                  "Create Content"
                 )}
               </Button>
             </div>
@@ -319,4 +362,4 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
   );
 };
 
-export default InstrumentModal;
+export default ExerciseContentModal;
