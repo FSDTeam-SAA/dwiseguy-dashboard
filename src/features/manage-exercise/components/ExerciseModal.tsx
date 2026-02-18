@@ -20,37 +20,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Instrument } from "../type";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { Exercise } from "../types";
+import { Loader2, X, ImagePlus } from "lucide-react";
 import Image from "next/image";
 
-const instrumentSchema = z.object({
-  instrumentTitle: z.string().min(2, "Title must be at least 2 characters"),
-  instrumentDescription: z
-    .string()
-    .min(10, "Description must be at least 10 characters"),
-  level: z.enum(["beginner", "intermediate", "advanced"]),
-  isActive: z.boolean().optional(),
+const exerciseSchema = z.object({
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  description: z.string().min(5, "Description must be at least 5 characters"),
 });
 
-type FormValues = z.infer<typeof instrumentSchema>;
+type FormValues = z.infer<typeof exerciseSchema>;
 
-interface InstrumentModalProps {
+interface ExerciseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: FormData) => void;
   isLoading: boolean;
-  initialData?: Instrument | null;
+  initialData?: Exercise | null;
 }
 
-const InstrumentModal: React.FC<InstrumentModalProps> = ({
+const ExerciseModal: React.FC<ExerciseModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
@@ -61,12 +50,10 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(instrumentSchema),
+    resolver: zodResolver(exerciseSchema),
     defaultValues: {
-      instrumentTitle: "",
-      instrumentDescription: "",
-      level: "beginner",
-      isActive: true,
+      title: "",
+      description: "",
     },
   });
 
@@ -74,28 +61,25 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
     if (isOpen) {
       if (initialData) {
         form.reset({
-          instrumentTitle: initialData.instrumentTitle,
-          instrumentDescription: initialData.instrumentDescription,
-          level: initialData.level,
-          isActive: initialData.isActive,
+          title: initialData.title,
+          description: initialData.description,
         });
 
-        const timer = setTimeout(() => {
-          setImagePreview(initialData.instrumentImage?.url || null);
+        // Handle Image Preview
+        // API response has `images` object with `url`
+        setTimeout(() => {
+          setImagePreview(initialData.images?.url || null);
+          setImageFile(null);
         }, 0);
-        return () => clearTimeout(timer);
       } else {
         form.reset({
-          instrumentTitle: "",
-          instrumentDescription: "",
-          level: "beginner",
-          isActive: true,
+          title: "",
+          description: "",
         });
-        const timer = setTimeout(() => {
+        setTimeout(() => {
           setImagePreview(null);
           setImageFile(null);
         }, 0);
-        return () => clearTimeout(timer);
       }
     }
   }, [initialData, form, isOpen]);
@@ -114,22 +98,22 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
 
   const onFormSubmit = (values: FormValues) => {
     const formData = new FormData();
-    formData.append("instrumentTitle", values.instrumentTitle);
-    formData.append("instrumentDescription", values.instrumentDescription);
-    formData.append("level", values.level);
-    formData.append("isActive", (values.isActive ?? true).toString());
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+
     if (imageFile) {
       formData.append("image", imageFile);
     }
+
     onSubmit(formData);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold bg-linear-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
-            {initialData ? "Update Instrument" : "Create New Instrument"}
+            {initialData ? "Update Exercise" : "Create New Exercise"}
           </DialogTitle>
         </DialogHeader>
 
@@ -140,15 +124,15 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
           >
             <FormField
               control={form.control}
-              name="instrumentTitle"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-gray-700">
-                    Instrument Title
+                    Title
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g. Piano, Guitar..."
+                      placeholder="e.g. Piano Basics"
                       {...field}
                       className="border-gray-200 focus:border-orange-500 focus:ring-orange-500"
                     />
@@ -158,68 +142,9 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="level"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold text-gray-700">
-                      Level
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="border-gray-200">
-                          <SelectValue placeholder="Select level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">
-                          Intermediate
-                        </SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold text-gray-700">
-                      Status
-                    </FormLabel>
-                    <Select
-                      onValueChange={(val) => field.onChange(val === "true")}
-                      defaultValue={(field.value ?? true).toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="border-gray-200">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="true">Active</SelectItem>
-                        <SelectItem value="false">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
             <FormField
               control={form.control}
-              name="instrumentDescription"
+              name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-gray-700">
@@ -227,7 +152,7 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe the instrument..."
+                      placeholder="Exercise description..."
                       className="min-h-[100px] border-gray-200 focus:border-orange-500 focus:ring-orange-500"
                       {...field}
                     />
@@ -237,9 +162,10 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
               )}
             />
 
+            {/* Image Upload */}
             <div className="space-y-4">
               <FormLabel className="font-bold text-gray-700">
-                Instrument Image
+                Exercise Image
               </FormLabel>
               <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
                 {imagePreview ? (
@@ -265,15 +191,12 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center cursor-pointer w-full py-8">
+                  <label className="flex flex-col items-center justify-center cursor-pointer w-full py-4">
                     <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-3">
                       <ImagePlus className="w-6 h-6" />
                     </div>
                     <span className="text-sm font-medium text-gray-600">
                       Click to upload image
-                    </span>
-                    <span className="text-xs text-gray-400 mt-1">
-                      Recommended: 1200x800px
                     </span>
                     <input
                       type="file"
@@ -306,9 +229,9 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
                     Saving...
                   </>
                 ) : initialData ? (
-                  "Update Instrument"
+                  "Update Exercise"
                 ) : (
-                  "Create Instrument"
+                  "Create Exercise"
                 )}
               </Button>
             </div>
@@ -319,4 +242,4 @@ const InstrumentModal: React.FC<InstrumentModalProps> = ({
   );
 };
 
-export default InstrumentModal;
+export default ExerciseModal;

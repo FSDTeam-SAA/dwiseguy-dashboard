@@ -1,184 +1,208 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
   createColumnHelper,
-  getPaginationRowModel,
 } from "@tanstack/react-table";
-import { Instrument } from "../type";
-import Image from "next/image";
+import { StudentReport } from "../type";
 import {
-  Edit2,
-  Trash2,
+  Search,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Plus,
-  Package,
-  Layers,
+  User,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Layout,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
-interface InstrumentsTableProps {
-  data: Instrument[];
-  onEdit: (instrument: Instrument) => void;
-  onDelete: (instrument: Instrument) => void;
-  onAdd: () => void;
+interface StudentProgressTableProps {
+  data: StudentReport[];
   pagination: {
     currentPage: number;
     totalPages: number;
     totalItems: number;
     onPageChange: (page: number) => void;
   };
+  onSearchChange: (value: string) => void;
+  searchValue: string;
 }
 
-const columnHelper = createColumnHelper<Instrument>();
-const coreRowModel = getCoreRowModel();
-const paginationRowModel = getPaginationRowModel();
+const columnHelper = createColumnHelper<StudentReport>();
 
-const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
+const StudentProgressTable: React.FC<StudentProgressTableProps> = ({
   data,
-  onEdit,
-  onDelete,
-  onAdd,
   pagination,
+  onSearchChange,
+  searchValue,
 }) => {
   "use no memo";
+  const [localSearch, setLocalSearch] = useState(searchValue);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearchChange(localSearch);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, onSearchChange]);
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor("instrumentImage", {
-        header: "Image",
+      columnHelper.accessor("student", {
+        header: "Student",
         cell: (info) => {
-          const url = info.getValue()?.url;
+          const student = info.getValue();
           return (
-            <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-gray-100 bg-gray-50 flex items-center justify-center">
-              {url ? (
-                <Image
-                  src={url}
-                  alt="Instrument"
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <Package className="w-6 h-6 text-gray-300" />
-              )}
+            <div className="flex items-center gap-3 min-w-[250px]">
+              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-gray-200 bg-gray-50 flex-shrink-0">
+                {student.avatar ? (
+                  <Image
+                    src={student.avatar}
+                    alt={student.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-primary/10 text-primary">
+                    <User className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-gray-900 line-clamp-1">
+                  {student.name}
+                </span>
+                <span className="text-xs text-gray-500 line-clamp-1">
+                  {student.email}
+                </span>
+              </div>
             </div>
           );
         },
       }),
-      columnHelper.accessor("instrumentTitle", {
-        header: "Title",
+      columnHelper.accessor("course", {
+        header: "Course",
         cell: (info) => (
-          <div className="flex flex-col min-w-[200px]">
-            <span className="font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
-              {info.getValue()}
-            </span>
-            <span className="text-xs text-gray-500 line-clamp-1 italic">
-              {info.row.original.instrumentDescription}
-            </span>
+          <div className="flex items-center gap-2 text-gray-600 font-medium whitespace-nowrap">
+            <BookOpen className="w-4 h-4 text-orange-400" />
+            <span>{info.getValue()}</span>
           </div>
         ),
       }),
-      columnHelper.accessor("level", {
-        header: "Level",
+      columnHelper.accessor("status", {
+        header: "Current Progress",
         cell: (info) => {
-          const level = info.getValue();
-          const colors = {
-            beginner: "bg-emerald-50 text-emerald-700 border-emerald-100",
-            intermediate: "bg-orange-50 text-orange-700 border-orange-100",
-            advanced: "bg-rose-50 text-rose-700 border-rose-100",
-          };
+          const status = info.getValue();
           return (
-            <Badge
-              variant="outline"
-              className={`capitalize font-bold border ${colors[level]}`}
-            >
-              {level}
-            </Badge>
+            <div className="flex flex-col gap-1 min-w-[200px]">
+              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <Layout className="w-3.5 h-3.5" />
+                <span className="font-medium truncate">
+                  {status.currentModule}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                <FileText className="w-3.5 h-3.5" />
+                <span className="truncate">{status.currentLesson}</span>
+              </div>
+            </div>
           );
         },
       }),
-      columnHelper.accessor("modules", {
-        header: "Modules",
-        cell: (info) => (
-          <div className="flex items-center gap-2 text-gray-600 font-medium">
-            <Layers className="w-4 h-4 text-orange-400" />
-            <span>{info.getValue()?.length || 0} Modules</span>
-          </div>
-        ),
+      columnHelper.accessor("metrics", {
+        header: "Completion",
+        cell: (info) => {
+          const metrics = info.getValue();
+          return (
+            <div className="flex flex-col gap-1.5 min-w-[120px]">
+              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                <span>Lessons</span>
+                <span className="text-gray-900">{metrics.lessonsDone}</span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                <span>Modules</span>
+                <span className="text-gray-900">{metrics.modulesDone}</span>
+              </div>
+            </div>
+          );
+        },
       }),
-      columnHelper.accessor("isActive", {
+      columnHelper.accessor("status.isCompleted", {
         header: "Status",
         cell: (info) => (
           <Badge
             className={`font-bold uppercase tracking-wider text-[10px] ${
               info.getValue()
-                ? "bg-green-500 text-white"
-                : "bg-gray-400 text-white"
+                ? "bg-emerald-500 text-white"
+                : "bg-amber-500 text-white"
             }`}
           >
-            {info.getValue() ? "Active" : "Inactive"}
+            {info.getValue() ? (
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                Completed
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                In Progress
+              </div>
+            )}
           </Badge>
         ),
       }),
-      columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Actions</div>,
+      columnHelper.accessor("lastActivity", {
+        header: "Last Activity",
         cell: (info) => (
-          <div className="flex items-center justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-all"
-              onClick={() => onEdit(info.row.original)}
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
-              onClick={() => onDelete(info.row.original)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+          <span className="text-sm text-gray-500 tabular-nums">
+            {new Date(info.getValue()).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
         ),
       }),
     ],
-    [onEdit, onDelete],
+    [],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: coreRowModel,
-    getPaginationRowModel: paginationRowModel,
+    getCoreRowModel: getCoreRowModel(),
   });
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Instruments
+            Student Progress
           </h2>
           <p className="text-sm text-gray-500 italic">
-            Manage your musical catalog
+            Monitor learning journey across all students
           </p>
         </div>
-        <Button
-          onClick={onAdd}
-          className="bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-lg shadow-orange-600/20 px-6"
-        >
-          <Plus className="mr-2 h-4 w-4" /> Create Instrument
-        </Button>
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search student or email..."
+            className="pl-10 h-11 border-gray-200 rounded-xl focus:ring-primary shadow-sm"
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="w-full bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -192,12 +216,10 @@ const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
                       key={header.id}
                       className="text-left px-6 py-4 text-[13px] font-black text-gray-500 uppercase tracking-widest"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                     </th>
                   ))}
                 </tr>
@@ -227,11 +249,10 @@ const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
                     className="px-6 py-12 text-center"
                   >
                     <div className="flex flex-col items-center justify-center text-gray-400 gap-3">
-                      <Package className="w-12 h-12 stroke-[1.5]" />
-                      <p className="font-bold text-lg">No instruments found</p>
-                      <Button variant="outline" size="sm" onClick={onAdd}>
-                        Add your first instrument
-                      </Button>
+                      <User className="w-12 h-12 stroke-[1.5]" />
+                      <p className="font-bold text-lg">
+                        No progress reports found
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -248,7 +269,7 @@ const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
             <span className="font-bold text-gray-900">
               {pagination.totalItems}
             </span>{" "}
-            instruments
+            reports
           </div>
 
           <div className="flex items-center gap-2">
@@ -308,4 +329,4 @@ const InstrumentsTable: React.FC<InstrumentsTableProps> = ({
   );
 };
 
-export default InstrumentsTable;
+export default StudentProgressTable;
