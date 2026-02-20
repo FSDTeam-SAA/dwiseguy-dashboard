@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   NotebookText,
   LogOut,
-  BookOpen,
   BarChart3,
   FolderKanban,
   FileText,
@@ -51,7 +50,7 @@ const navigation = [
     icon: Dumbbell,
   },
   { name: "Quizzes", href: "/dashboard/quizzes", icon: ClipboardCheck },
-  { name: "Add Member", href: "/dashboard/add-member", icon: UserPlus },
+  { name: "Members", href: "/dashboard/members", icon: UserPlus },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
