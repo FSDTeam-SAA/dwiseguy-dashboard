@@ -80,19 +80,14 @@ const LessonModal: React.FC<LessonModalProps> = ({
           isExercise: initialData.isExercise,
         });
 
-        // Handle Image Preview
+        // Initialize previews from initialData
         const imgUrl = initialData.media?.images?.[0]?.url || null;
-        if (imagePreview !== imgUrl) {
-          setTimeout(() => setImagePreview(imgUrl), 0);
-        }
-        setTimeout(() => setImageFile(null), 0);
+        setImagePreview(imgUrl);
+        setImageFile(null);
 
-        // Handle Audio Preview
         const audUrl = initialData.media?.audio?.url || null;
-        if (audioPreview !== audUrl) {
-          setTimeout(() => setAudioPreview(audUrl), 0);
-        }
-        setTimeout(() => setAudioFile(null), 0);
+        setAudioPreview(audUrl);
+        setAudioFile(null);
       } else {
         form.reset({
           title: "",
@@ -101,15 +96,14 @@ const LessonModal: React.FC<LessonModalProps> = ({
           order: 1,
           isExercise: false,
         });
-        setTimeout(() => {
-          setImagePreview(null);
-          setImageFile(null);
-          setAudioPreview(null);
-          setAudioFile(null);
-        }, 0);
+        setImagePreview(null);
+        setImageFile(null);
+        setAudioPreview(null);
+        setAudioFile(null);
       }
     }
-  }, [initialData, form, isOpen, moduleId, imagePreview, audioPreview]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData, isOpen, moduleId]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -127,21 +121,28 @@ const LessonModal: React.FC<LessonModalProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       setAudioFile(file);
-      // For audio, we might just want to show the name or a player if it's a URL
-      // But creating a blob URL for preview is also possible
       setAudioPreview(URL.createObjectURL(file));
     }
   };
 
   const onFormSubmit = (values: FormValues) => {
     const formData = new FormData();
-    const jsonData = {
+    const jsonData: Record<string, any> = {
       moduleId: values.moduleId,
       title: values.title,
       content: values.content,
       isExercise: values.isExercise,
       order: values.order,
     };
+
+    // Handle removal of existing media
+    if (!imagePreview && !imageFile) {
+      jsonData.removeImage = true;
+    }
+    if (!audioPreview && !audioFile) {
+      jsonData.removeAudio = true;
+    }
+
     formData.append("data", JSON.stringify(jsonData));
 
     if (imageFile) {
