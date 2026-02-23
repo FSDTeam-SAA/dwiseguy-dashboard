@@ -24,30 +24,12 @@ import { useState } from "react";
 import HeaderTitle from "./Headertitle";
 // import HeaderTitle from "../ReusableComponents/HeaderTitle";
 
-interface UserProfile {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  image?: { url?: string };
-}
+import { usePersonalInfo } from "@/features/account/hooks/usePersonalInfo";
 
 export default function DashboardHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-
-  //  DIRECT FAKE JSON DATA
-  const user: UserProfile = {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    image: {
-      url: "https://i.pravatar.cc/150?img=21",
-    },
-  };
-
-  // const unseenCount = 0;
-
-  const loading = false;
+  const { user, loading } = usePersonalInfo();
 
   const handleLogout = () => {
     signOut();
@@ -85,18 +67,6 @@ export default function DashboardHeader() {
 
       {/* Right side */}
       <div className="flex items-center gap-5">
-        {/* <Link href="/notification">
-                    <button className="relative group p-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 transition-all hover:scale-105 active:scale-95">
-                        <Bell className="h-5 w-5 text-slate-600 group-hover:text-orange-600 transition-colors" />
-
-                        {unseenCount > 0 && (
-                            <span className="absolute -top-1.5 -right-1.5 h-5 min-w-[20px] px-1.5 rounded-full bg-orange-600 border-2 border-white text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
-                                {unseenCount}
-                            </span>
-                        )}
-                    </button>
-                </Link> */}
-
         {/* User Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -107,12 +77,11 @@ export default function DashboardHeader() {
               <div className="relative">
                 <Avatar className="h-10 w-10 border-2 border-white shadow-sm ring-1 ring-slate-100 transition-transform group-hover:scale-105">
                   <AvatarImage
-                    src={user.image?.url || "/images/profile-mini.jpg"}
+                    src={user?.avatar?.url || "/images/profile-mini.jpg"}
                     alt="User"
                   />
                   <AvatarFallback className="bg-orange-50 text-orange-700 font-bold uppercase">
-                    {user.firstName?.charAt(0)}
-                    {user.lastName?.charAt(0)}
+                    {user?.name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
@@ -120,10 +89,10 @@ export default function DashboardHeader() {
 
               <div className="hidden sm:flex flex-col text-left">
                 <span className="text-sm font-bold text-slate-900 group-hover:text-orange-600 transition-colors">
-                  {user.firstName} {user.lastName}
+                  {user?.name || "User"}
                 </span>
                 <span className="text-[11px] font-medium text-slate-500">
-                  {user.email}
+                  {user?.email}
                 </span>
               </div>
             </Button>

@@ -49,7 +49,7 @@ const navigation = [
     href: "/dashboard/manage-exercise",
     icon: Dumbbell,
   },
-  { name: "Quizzes", href: "/dashboard/quizzes", icon: ClipboardCheck },
+  { name: "Quizzes", href: "/dashboard/quiz-management", icon: ClipboardCheck },
   { name: "Members", href: "/dashboard/members", icon: UserPlus },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];

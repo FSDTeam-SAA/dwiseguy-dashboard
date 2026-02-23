@@ -59,37 +59,6 @@ const ChangePassword = () => {
   return (
     <div className="min-h-screen bg-transparent space-y-10 py-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* Security Command Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-gray-950 p-10 rounded-[2.5rem] shadow-3xl relative overflow-hidden ring-1 ring-white/10">
-        <div className="space-y-4 relative z-10">
-          <div className="flex items-center gap-3">
-            <span className="flex h-3 w-3 rounded-full bg-[#ff7a00] animate-pulse ring-4 ring-[#ff7a00]/20"></span>
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-              Access Control
-            </span>
-          </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter">
-            Security <span className="text-[#ff7a00]">Protocol</span>
-          </h1>
-          <p className="text-gray-400 max-w-xl text-lg leading-relaxed">
-            Update your authentication credentials. We recommend a unique
-            16-character string to maintain maximum account integrity.
-          </p>
-        </div>
-
-        <div className="hidden md:flex bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 space-y-1 relative z-10">
-          <div className="text-gray-500 text-xs font-bold uppercase tracking-tighter flex items-center gap-2 text-white">
-            <Zap size={14} className="text-[#ff7a00]" /> Encryption
-          </div>
-          <div className="text-2xl font-mono text-green-400 tracking-widest">
-            AES-256
-          </div>
-        </div>
-
-        {/* Cyber Background Pattern - Matching the PriceSet component */}
-        <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-10 right-10 w-64 h-64 bg-[#ff7a00] rounded-full blur-[120px]"></div>
-        </div>
-      </div>
 
       {/* Password Update Form */}
       <div className="max-w-2xl mx-auto">
@@ -170,8 +139,6 @@ const ChangePassword = () => {
                   </button>
                 </div>
               </div>
-
-              
             </CardContent>
 
             <CardFooter className="p-8 pb-10">
