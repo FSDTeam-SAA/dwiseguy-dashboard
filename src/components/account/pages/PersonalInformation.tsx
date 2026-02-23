@@ -20,7 +20,6 @@ import {
   Camera,
   CheckCircle2,
   Sparkles,
-  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePersonalInfo } from "@/features/account/hooks/usePersonalInfo";
@@ -35,16 +34,20 @@ const PersonalInformation = () => {
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const isFilled = React.useRef(false);
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || "",
-        age: user.age?.toString() || "",
+    if (user && !isFilled.current) {
+      React.startTransition(() => {
+        setFormData({
+          name: user.name || "",
+          age: user.age?.toString() || "",
+        });
+        if (user.avatar?.url) {
+          setImagePreview(user.avatar.url);
+        }
       });
-      if (user.avatar?.url) {
-        setImagePreview(user.avatar.url);
-      }
+      isFilled.current = true;
     }
   }, [user]);
 
@@ -76,17 +79,20 @@ const PersonalInformation = () => {
         description: "Your personal data has been updated on the main frame.",
         icon: <CheckCircle2 className="text-green-500" />,
       });
-    } catch (err: any) {
-      // Error handled by hook, but toast can be added for redundancy if needed
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Update failed";
+      toast.error("Process Failed", {
+        description: errorMsg,
+      });
     }
   };
 
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <Skeleton className="h-48 w-full rounded-[2.5rem]" />
+        <Skeleton className="h-48 w-full rounded-4xl" />
         <div className="max-w-2xl mx-auto space-y-6">
-          <Skeleton className="h-96 w-full rounded-[2rem]" />
+          <Skeleton className="h-96 w-full rounded-4xl" />
         </div>
       </div>
     );
@@ -98,7 +104,7 @@ const PersonalInformation = () => {
 
       {/* Main Form container */}
       <div className="max-w-2xl mx-auto">
-        <Card className="group bg-white border-2 border-gray-100 rounded-[2rem] transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl focus-within:border-blue-500/50 overflow-hidden">
+        <Card className="group bg-white border-2 border-gray-100 rounded-4xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl focus-within:border-blue-500/50 overflow-hidden">
           <form onSubmit={handleSubmit}>
             <CardHeader className="space-y-4 p-8">
               <div className="flex items-center justify-between">
@@ -228,7 +234,7 @@ const PersonalInformation = () => {
                     </>
                   )}
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 translate-x-[-100%] group-hover/btn:translate-x-0 transition-transform duration-500"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-indigo-600 -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-500"></div>
               </Button>
             </CardFooter>
           </form>

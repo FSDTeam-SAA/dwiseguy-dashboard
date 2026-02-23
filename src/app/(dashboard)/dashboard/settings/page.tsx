@@ -44,7 +44,7 @@ const SettingsPage = () => {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex flex-wrap gap-4 mb-10 bg-gray-100/50 p-2 rounded-[2rem] w-fit border border-gray-200">
+      <div className="flex flex-wrap gap-4 mb-10 bg-gray-100/50 p-2 rounded-4xl w-fit border border-gray-200">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -52,9 +52,9 @@ const SettingsPage = () => {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as "profile" | "security")}
               className={cn(
-                "flex items-center gap-3 px-8 py-4 rounded-[1.5rem] text-sm font-bold transition-all duration-500 relative overflow-hidden group",
+                "flex items-center gap-3 px-8 py-4 rounded-3xl text-sm font-bold transition-all duration-500 relative overflow-hidden group",
                 isActive
                   ? "bg-white text-slate-900 shadow-xl shadow-slate-200/50 scale-105"
                   : "text-slate-500 hover:text-slate-900 hover:bg-white/50",

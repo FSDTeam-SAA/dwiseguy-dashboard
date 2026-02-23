@@ -15,7 +15,6 @@ import {
   Lock,
   ShieldCheck,
   Loader2,
-  Zap,
   KeyRound,
   Eye,
   EyeOff,
@@ -62,7 +61,7 @@ const ChangePassword = () => {
 
       {/* Password Update Form */}
       <div className="max-w-2xl mx-auto">
-        <Card className="group bg-white border-2 border-gray-100 rounded-[2rem] transition-all duration-500 hover:border-[#ff7a00]/30 hover:shadow-2xl focus-within:border-[#ff7a00]/50">
+        <Card className="group bg-white border-2 border-gray-100 rounded-4xl transition-all duration-500 hover:border-[#ff7a00]/30 hover:shadow-2xl focus-within:border-[#ff7a00]/50">
           <form onSubmit={handleSubmit}>
             <CardHeader className="space-y-4 p-8">
               <div className="flex items-center justify-between">
@@ -154,7 +153,7 @@ const ChangePassword = () => {
                     "Authorize Password Update"
                   )}
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#ff7a00] to-[#ff9500] translate-x-[-100%] group-hover/btn:translate-x-0 transition-transform duration-500"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-[#ff7a00] to-[#ff9500] -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-500"></div>
               </Button>
             </CardFooter>
           </form>
