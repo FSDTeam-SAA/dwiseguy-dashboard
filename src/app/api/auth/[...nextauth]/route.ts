@@ -83,7 +83,8 @@ const handler = NextAuth({
             email: userData.email,
             name: userData.email.split("@")[0], // Fallback name
             image: "",
-            role: "admin", // Dashboard users are usually admins or staff
+            role: userData.role,
+            // role: "admin", // Dashboard users are usually admins or staff
             token: userData.accessToken,
             refreshToken: userData.refreshToken,
           };
