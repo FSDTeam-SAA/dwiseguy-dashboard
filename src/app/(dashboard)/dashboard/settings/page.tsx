@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PersonalInformation from "@/components/account/pages/PersonalInformation";
 import ChangePassword from "@/components/account/pages/ChangePassword";
 import { User, Lock, Settings as SettingsIcon } from "lucide-react";
@@ -8,6 +8,24 @@ import { cn } from "@/lib/utils";
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = globalThis.location.hash;
+      if (hash === "#security") {
+        setActiveTab("security");
+      } else if (hash === "#profile") {
+        setActiveTab("profile");
+      }
+    };
+
+    // Set initial tab based on hash
+    handleHashChange();
+
+    // Listen for hash changes
+    globalThis.addEventListener("hashchange", handleHashChange);
+    return () => globalThis.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const tabs = [
     {
