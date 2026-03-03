@@ -56,7 +56,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent space-y-10 py-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="min-h-screen bg-transparent space-y-10 py-6 animate-in fade-in slide-in-from-bottom-4 duration-1000" >
       {/* Security Command Header */}
 
       {/* Password Update Form */}

@@ -108,7 +108,7 @@ export default function DashboardHeader() {
               </p>
             </div>
 
-            <Link href="/profile">
+            <Link href="/dashboard/settings">
               <DropdownMenuItem className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-slate-50 focus:bg-slate-50 transition-colors">
                 <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
                   <User2Icon size={18} />
@@ -119,7 +119,7 @@ export default function DashboardHeader() {
               </DropdownMenuItem>
             </Link>
 
-            <Link href="/profile/changePassword">
+            <Link href="/dashboard/settings#security">
               <DropdownMenuItem className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-slate-50 focus:bg-slate-50 transition-colors">
                 <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
                   <KeyIcon size={18} />
