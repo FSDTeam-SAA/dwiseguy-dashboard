@@ -3,7 +3,7 @@ import React from "react";
 import { useOverview } from "@/features/dashboard/hooks/useOverview";
 import CardOverview from "./CardOverview";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, BookOpen, DollarSign } from "lucide-react";
+import { Users, BookOpen, GraduationCap } from "lucide-react";
 
 const Cards = () => {
   const { data, loading, error } = useOverview();
@@ -12,7 +12,7 @@ const Cards = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-40 rounded-xl" />
+          <Skeleton key={i} className="h-44 rounded-2xl" />
         ))}
       </div>
     );
@@ -20,8 +20,8 @@ const Cards = () => {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 text-red-500 rounded-lg">
-        Failed to load dashboard stats.
+      <div className="p-8 bg-red-50 text-red-500 rounded-2xl border border-red-100 font-medium text-center">
+        Failed to load dashboard statistics.
       </div>
     );
   }
@@ -31,27 +31,33 @@ const Cards = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <CardOverview
-        title="Total Enrolled Students"
+        title="Total Students"
         numberInfo={data.totalEnrolledStudents.toLocaleString()}
         trend="+ 36%"
         isUp={true}
         Icon={Users}
+        color="#8B7EF8"
+        bgColor="#F0EFFF"
       />
 
       <CardOverview
-        title="Total Lessons Completed"
-        numberInfo={data.totalLessonsCompleted.toLocaleString()}
-        trend="+ 10%"
-        isUp={true}
+        title="Lesson completion"
+        numberInfo={`${Math.round((data.totalLessonsCompleted / (data.totalEnrolledStudents * 10 || 1)) * 100)}%`}
+        trend="- 14%"
+        isUp={false}
         Icon={BookOpen}
+        color="#FF8B36"
+        bgColor="#FFF5EF"
       />
 
       <CardOverview
-        title="Completed Courses"
-        numberInfo={data.completedCourses.toLocaleString()}
+        title="Passed Modules"
+        numberInfo={data.totalModulesPassed.toLocaleString()}
         trend="+ 20%"
         isUp={true}
-        Icon={DollarSign}
+        Icon={GraduationCap}
+        color="#10B981"
+        bgColor="#EFFFF6"
       />
     </div>
   );
