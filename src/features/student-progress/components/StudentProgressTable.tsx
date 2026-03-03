@@ -186,7 +186,7 @@ const StudentProgressTable: React.FC<StudentProgressTableProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
+        {/*<div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
             Student Progress
           </h2>
@@ -194,7 +194,7 @@ const StudentProgressTable: React.FC<StudentProgressTableProps> = ({
             Monitor learning journey across all students
           </p>
         </div>
-        <div className="relative w-full md:w-72">
+         <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search student or email..."
@@ -202,7 +202,7 @@ const StudentProgressTable: React.FC<StudentProgressTableProps> = ({
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="w-full bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
