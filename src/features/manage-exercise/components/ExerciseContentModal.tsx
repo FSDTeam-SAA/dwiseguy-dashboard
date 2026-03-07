@@ -24,6 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ExerciseContent } from "../types";
 import { Loader2, X, ImagePlus, Music, FileAudio } from "lucide-react";
 import Image from "next/image";
+import { convertToMp3 } from "@/lib/audioConverter";
+
 
 const contentSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -54,6 +56,7 @@ const ExerciseContentModal: React.FC<ExerciseContentModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioPreview, setAudioPreview] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(contentSchema),
@@ -118,13 +121,13 @@ const ExerciseContentModal: React.FC<ExerciseContentModalProps> = ({
     }
   };
 
-  const onFormSubmit = (values: FormValues) => {
+  const onFormSubmit = async (values: FormValues) => {
     const formData = new FormData();
     const keyNotesArray = values.keyNotes
       ? values.keyNotes
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
       : [];
 
     const jsonData: Record<string, unknown> = {
@@ -143,11 +146,29 @@ const ExerciseContentModal: React.FC<ExerciseContentModalProps> = ({
       formData.append("image", imageFile);
     }
     if (audioFile) {
-      formData.append("audio", audioFile);
+      setIsConverting(true);
+      try {
+        const convertedAudio = await convertToMp3(audioFile);
+        formData.append("audio", convertedAudio);
+      } finally {
+        setIsConverting(false);
+      }
     }
 
     onSubmit(formData);
   };
+
+  let buttonContent;
+  if (isLoading || isConverting) {
+    buttonContent = (
+      <>
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        {isConverting ? "Converting Audio..." : "Saving..."}
+      </>
+    );
+  } else {
+    buttonContent = initialData ? "Update Content" : "Create Content";
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -319,7 +340,9 @@ const ExerciseContentModal: React.FC<ExerciseContentModalProps> = ({
                   </label>
                 )}
                 {audioPreview && !audioFile && (
-                  <audio controls src={audioPreview} className="w-full mt-2" />
+                  <audio controls src={audioPreview} className="w-full mt-2">
+                    <track kind="captions" />
+                  </audio>
                 )}
                 {audioPreview && audioFile && (
                   <div className="text-xs text-center text-gray-500">
@@ -343,16 +366,7 @@ const ExerciseContentModal: React.FC<ExerciseContentModalProps> = ({
                 disabled={isLoading}
                 className="bg-orange-600 hover:bg-orange-700 text-white font-bold px-8 shadow-lg shadow-orange-600/20"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : initialData ? (
-                  "Update Content"
-                ) : (
-                  "Create Content"
-                )}
+                {buttonContent}
               </Button>
             </div>
           </form>

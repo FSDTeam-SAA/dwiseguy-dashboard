@@ -25,6 +25,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Lesson } from "../type";
 import { Loader2, X, ImagePlus, Music, FileAudio } from "lucide-react";
 import Image from "next/image";
+import { convertToMp3 } from "@/lib/audioConverter";
+
 
 const lessonSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -57,6 +59,7 @@ const LessonModal: React.FC<LessonModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioPreview, setAudioPreview] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(lessonSchema),
@@ -125,9 +128,9 @@ const LessonModal: React.FC<LessonModalProps> = ({
     }
   };
 
-  const onFormSubmit = (values: FormValues) => {
+  const onFormSubmit = async (values: FormValues) => {
     const formData = new FormData();
-    const jsonData: Record<string, any> = {
+    const jsonData: Record<string, unknown> = {
       moduleId: values.moduleId,
       title: values.title,
       content: values.content,
@@ -149,7 +152,13 @@ const LessonModal: React.FC<LessonModalProps> = ({
       formData.append("images", imageFile);
     }
     if (audioFile) {
-      formData.append("audio", audioFile);
+      setIsConverting(true);
+      try {
+        const convertedAudio = await convertToMp3(audioFile);
+        formData.append("audio", convertedAudio);
+      } finally {
+        setIsConverting(false);
+      }
     }
 
     onSubmit(formData);
@@ -366,10 +375,10 @@ const LessonModal: React.FC<LessonModalProps> = ({
                 disabled={isLoading}
                 className="bg-orange-600 hover:bg-orange-700 text-white font-bold px-8 shadow-lg shadow-orange-600/20"
               >
-                {isLoading ? (
+                {isLoading || isConverting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    {isConverting ? "Converting Audio..." : "Saving..."}
                   </>
                 ) : initialData ? (
                   "Update Lesson"
