@@ -27,6 +27,13 @@ import { Loader2, X, ImagePlus, Music, FileAudio } from "lucide-react";
 import Image from "next/image";
 import { convertToMp3 } from "@/lib/audioConverter";
 
+// Represents an image preview: either an existing server URL or a newly selected file
+interface ImageItem {
+  id: string; // unique key for React rendering
+  url: string; // preview URL (server URL or data URL)
+  file?: File; // only present for newly added images
+  isExisting: boolean; // true if this came from the server
+}
 
 const lessonSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -55,8 +62,7 @@ const LessonModal: React.FC<LessonModalProps> = ({
   initialData,
   moduleId,
 }) => {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioPreview, setAudioPreview] = useState<string | null>(null);
   const [isConverting, setIsConverting] = useState(false);
@@ -83,10 +89,14 @@ const LessonModal: React.FC<LessonModalProps> = ({
           isExercise: initialData.isExercise,
         });
 
-        // Initialize previews from initialData
-        const imgUrl = initialData.media?.images?.[0]?.url || null;
-        setImagePreview(imgUrl);
-        setImageFile(null);
+        // Initialize all existing images from initialData
+        const existingImages: ImageItem[] =
+          initialData.media?.images?.map((img, i) => ({
+            id: `existing-${img._id || i}`,
+            url: img.url,
+            isExisting: true,
+          })) || [];
+        setImages(existingImages);
 
         const audUrl = initialData.media?.audio?.url || null;
         setAudioPreview(audUrl);
@@ -99,8 +109,7 @@ const LessonModal: React.FC<LessonModalProps> = ({
           order: 1,
           isExercise: false,
         });
-        setImagePreview(null);
-        setImageFile(null);
+        setImages([]);
         setAudioPreview(null);
         setAudioFile(null);
       }
@@ -109,15 +118,31 @@ const LessonModal: React.FC<LessonModalProps> = ({
   }, [initialData, isOpen, moduleId]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setImages((prev) => [
+          ...prev,
+          {
+            id: `new-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            url: reader.result as string,
+            file,
+            isExisting: false,
+          },
+        ]);
       };
       reader.readAsDataURL(file);
-    }
+    });
+
+    // Reset the input so the same file(s) can be re-selected
+    e.target.value = "";
+  };
+
+  const removeImage = (id: string) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,19 +163,32 @@ const LessonModal: React.FC<LessonModalProps> = ({
       order: values.order,
     };
 
-    // Handle removal of existing media
-    if (!imagePreview && !imageFile) {
+    const newImages = images.filter((img) => !img.isExisting);
+    const existingImages = images.filter((img) => img.isExisting);
+
+    // Handle removal of all images
+    if (images.length === 0) {
       jsonData.removeImage = true;
     }
+
+    // Pass the existing image URLs that should be kept
+    if (existingImages.length > 0) {
+      jsonData.existingImages = existingImages.map((img) => img.url);
+    }
+
     if (!audioPreview && !audioFile) {
       jsonData.removeAudio = true;
     }
 
     formData.append("data", JSON.stringify(jsonData));
 
-    if (imageFile) {
-      formData.append("images", imageFile);
-    }
+    // Append all new image files
+    newImages.forEach((img) => {
+      if (img.file) {
+        formData.append("images", img.file);
+      }
+    });
+
     if (audioFile) {
       setIsConverting(true);
       try {
@@ -263,50 +301,64 @@ const LessonModal: React.FC<LessonModalProps> = ({
               )}
             />
 
-            {/* Image Upload */}
+            {/* Image Upload - Multiple */}
             <div className="space-y-4">
               <FormLabel className="font-bold text-gray-700">
-                Lesson Image
+                Lesson Images
               </FormLabel>
-              <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
-                {imagePreview ? (
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden group">
-                    <Image
-                      src={imagePreview}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          setImageFile(null);
-                          setImagePreview(null);
-                        }}
+              <div className="flex flex-col gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                {/* Image Grid */}
+                {images.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {images.map((img) => (
+                      <div
+                        key={img.id}
+                        className="relative aspect-video rounded-xl overflow-hidden group border border-gray-200"
                       >
-                        <X className="w-4 h-4 mr-2" /> Remove Image
-                      </Button>
-                    </div>
+                        <Image
+                          src={img.url}
+                          alt="Preview"
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(img.id)}
+                          className="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                        {img.isExisting && (
+                          <span className="absolute bottom-1.5 left-1.5 text-[9px] bg-black/60 text-white px-1.5 py-0.5 rounded-full font-medium">
+                            Saved
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center cursor-pointer w-full py-4">
-                    <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-3">
-                      <ImagePlus className="w-6 h-6" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-600">
-                      Click to upload image
-                    </span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </label>
                 )}
+
+                {/* Upload Button - Always Visible */}
+                <label className="flex flex-col items-center justify-center cursor-pointer w-full py-4 border border-dashed border-gray-300 rounded-xl hover:border-orange-400 transition-colors">
+                  <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-2">
+                    <ImagePlus className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">
+                    {images.length > 0
+                      ? "Add more images"
+                      : "Click to upload images"}
+                  </span>
+                  <span className="text-xs text-gray-400 mt-0.5">
+                    You can select multiple files
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                  />
+                </label>
               </div>
             </div>
 
